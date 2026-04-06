@@ -147,6 +147,7 @@ function Row({ label, children: c }) {
 function RevCounter({ label, pct, sub }) {
   const barColor = pct >= 80 ? '#22c55e' : pct >= 50 ? '#4f7cff' : pct >= 25 ? '#f59e0b' : '#ef4444'
   const rating = getRating(pct)
+  const barColor = pct >= 80 ? '#22c55e' : pct >= 50 ? '#4f7cff' : pct >= 25 ? '#f59e0b' : '#ef4444'
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:12, width:'100%' }}>
       <div style={{ fontSize:11, color:'var(--muted)', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.06em' }}>{label}</div>
