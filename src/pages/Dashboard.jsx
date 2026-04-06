@@ -144,60 +144,25 @@ function Row({ label, children: c }) {
 }
 
 // ─── Rev Counter ───────────────────────────────────────────────────
-function RevCounter({ label, pct, sub }) {
-  const size = 180
-  const cx = size / 2, cy = size / 2, r = size * 0.38
-  const rating = getRating(pct)
-  const segs = [
-    { from: 0, to: 25, color: '#ef4444' },
-    { from: 25, to: 50, color: '#f59e0b' },
-    { from: 50, to: 80, color: '#4f7cff' },
-    { from: 80, to: 100, color: '#22c55e' },
-  ]
-
-  function arcPath(fromPct, toPct) {
-    const a1 = Math.PI - (fromPct / 100) * Math.PI
-    const a2 = Math.PI - (toPct / 100) * Math.PI
-    const x1 = cx + r * Math.cos(a1), y1 = cy - r * Math.sin(a1)
-    const x2 = cx + r * Math.cos(a2), y2 = cy - r * Math.sin(a2)
-    const large = (toPct - fromPct) > 50 ? 1 : 0
-    return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 0 ${x2} ${y2}`
-  }
-
-  const needleAngle = Math.PI - (Math.min(100, Math.max(0, pct)) / 100) * Math.PI
-  const nx = cx + r * 0.72 * Math.cos(needleAngle)
-  const ny = cy - r * 0.72 * Math.sin(needleAngle)
-
+const rating = getRating(pct)
+  const barColor = pct >= 80 ? '#22c55e' : pct >= 50 ? '#4f7cff' : pct >= 25 ? '#f59e0b' : '#ef4444'
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-      <svg width={size} height={size * 0.62} viewBox={`0 0 ${size} ${size * 0.62}`}>
-        <path d={arcPath(0, 100)} fill="none" stroke="var(--border)" strokeWidth={size * 0.075} strokeLinecap="round" />
-        {segs.map(seg => {
-          const filled = Math.min(seg.to, Math.max(seg.from, pct))
-          if (filled <= seg.from) return null
-          return <path key={seg.from} d={arcPath(seg.from, filled)} fill="none" stroke={seg.color} strokeWidth={size * 0.075} strokeLinecap="round" />
-        })}
-        <line x1={cx} y1={cy} x2={nx} y2={ny} stroke="var(--text)" strokeWidth={2.5} strokeLinecap="round" />
-        <circle cx={cx} cy={cy} r={size * 0.04} fill="var(--text)" />
-        <text x={cx} y={cy - 8} textAnchor="middle" fill="var(--text)" fontSize={size * 0.135} fontWeight="700" fontFamily="Syne,sans-serif">{pct}%</text>
-      </svg>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontFamily: 'Syne,sans-serif', fontWeight: 700, fontSize: 16, color: rating.color }}>{rating.label}</div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginTop: 2 }}>{label}</div>
-        {sub && <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4, lineHeight: 1.4 }}>{sub}</div>}
+    <div style={{ display:'flex', flexDirection:'column', gap:12, width:'100%' }}>
+      <div style={{ fontSize:11, color:'var(--muted)', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.06em' }}>{label}</div>
+      <div style={{ fontSize:48, fontWeight:700, lineHeight:1, color:barColor, fontFamily:'Syne,sans-serif' }}>
+        {pct}<span style={{ fontSize:24 }}>%</span>
       </div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
-        {[['Inadequate', '#ef4444'], ['RI', '#f59e0b'], ['Good', '#4f7cff'], ['Outstanding', '#22c55e']].map(([l, c]) => (
-          <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: c }} />
-            <span style={{ fontSize: 11, color: 'var(--muted)' }}>{l}</span>
-          </div>
-        ))}
+      <div style={{ height:6, background:'var(--border)', borderRadius:3, overflow:'hidden' }}>
+        <div style={{ height:'100%', width:`${pct}%`, background:'linear-gradient(90deg,#ef4444 0%,#f59e0b 25%,#4f7cff 50%,#22c55e 80%)', borderRadius:3, transition:'width 0.6s' }} />
       </div>
+      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+        <div style={{ width:8, height:8, borderRadius:'50%', background:barColor, flexShrink:0 }} />
+        <span style={{ fontSize:13, color:barColor, fontWeight:600 }}>{rating.label}</span>
+      </div>
+      {sub && <div style={{ fontSize:12, color:'var(--muted)', lineHeight:1.5 }}>{sub}</div>}
     </div>
   )
 }
-
 // ─── Main App ──────────────────────────────────────────────────────
 export default function Dashboard({ profile, onLogout }) {
   const [activeTab, setActiveTab] = useState('Dashboard')
