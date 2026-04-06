@@ -145,7 +145,7 @@ function Row({ label, children: c }) {
 
 // ─── Rev Counter ───────────────────────────────────────────────────
 function RevCounter({ label, pct, sub }) {
-  const size = 180
+  const barColor = pct >= 80 ? '#22c55e' : pct >= 50 ? '#4f7cff' : pct >= 25 ? '#f59e0b' : '#ef4444'
   const cx = size / 2, cy = size / 2, r = size * 0.38
   const rating = getRating(pct)
   const segs = [
