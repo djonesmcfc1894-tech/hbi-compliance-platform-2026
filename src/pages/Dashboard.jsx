@@ -101,6 +101,8 @@ const HOME_ITEMS_DEF = [
   { label: 'Insurance Certificates', type: 'date', days: 365 },
   { label: 'Building Risk Assessment', type: 'date', days: 365 },
   { label: 'Ofsted Registration Current', type: 'task' },
+  { label: 'Regulation 45 Report', type: 'reg45', days: 182 },
+  { label: 'Regulation 46 Location Risk Assessment', type: 'date', days: 365 },
 ]
 
 const TRAINING_COLS = ['Safeguarding', 'First Aid', 'Fire Safety', 'Moving & Handling', 'Team Teach', 'Medication', 'Restraint/PBS']
