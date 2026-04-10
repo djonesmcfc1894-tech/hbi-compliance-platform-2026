@@ -36,7 +36,7 @@ function ragFromDate(dateStr, warningDays = 60, maxDays = null) {
 function calcHomeScore(items) {
   if (!items.length) return 0
   const compliant = items.filter(item =>
-    item.item_type === 'task' || item.item_type === 'reg45' ? item.status === 'done' : isCompliantDate(item.last_completed, item.max_days || 365)
+    item.item_type === 'task' || item.item_type === 'reg45' ? item.status === 'done' : isCompliantDate(item.last_completed, parseInt(item.freq) || 365)
   ).length
   return Math.round((compliant / items.length) * 100)
 }
@@ -192,7 +192,7 @@ export default function Dashboard({ profile, onLogout }) {
     ])
     let items = hi.data || []
     if (!items.length) {
-      const seeds = HOME_ITEMS_DEF.map((item, i) => ({ user_id: uid, label: item.label, item_type: item.type, max_days: item.days || null, sort_order: i, status: 'pending' }))
+      const seeds = HOME_ITEMS_DEF.map((item, i) => ({ user_id: uid, label: item.label, item_type: item.type, freq: item.days ? item.days + 'd' : null, sort_order: i, status: 'pending' }))
       const { data: seeded } = await supabase.from('home_items').insert(seeds).select()
       items = seeded || []
     }
