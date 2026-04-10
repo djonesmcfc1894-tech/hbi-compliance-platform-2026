@@ -36,7 +36,7 @@ function ragFromDate(dateStr, warningDays = 60, maxDays = null) {
 function calcHomeScore(items) {
   if (!items.length) return 0
   const compliant = items.filter(item =>
-    item.item_type === 'task' ? item.status === 'done' : isCompliantDate(item.last_completed, item.max_days || 365)
+    item.item_type === 'task' || item.item_type === 'reg45' ? item.status === 'done' : isCompliantDate(item.last_completed, item.max_days || 365)
   ).length
   return Math.round((compliant / items.length) * 100)
 }
@@ -402,16 +402,16 @@ function HomeView({ items, details, onUpdate, onSaveDetails }) {
           <thead><tr><th style={{...th,textAlign:'left'}}>Item</th><th style={th}>Frequency</th><th style={th}>Last Completed</th><th style={th}>Status</th><th style={th}>Notes</th></tr></thead>
           <tbody>
             {items.map(item => {
-              const rag = item.item_type==='task' ? (item.status==='done'?'done':'pending') : ragFromDate(item.last_completed, 60, item.max_days||365)
+                  const rag = item.item_type==='task'||item.item_type==='reg45' ? (item.status==='done'?'done':'pending') : ragFromDate(item.last_completed, 60, item.max_days||182)
               return (
                 <tr key={item.id}>
                   <td style={{...td,fontWeight:500}}>{item.label}</td>
                   <td style={{...td,textAlign:'center'}}>
-                    {item.item_type==='date' ? <span style={{background:'var(--surface2)',border:'1px solid var(--accent)',color:'var(--accent)',borderRadius:4,padding:'2px 8px',fontSize:12}}>{item.max_days}d</span>
+                    {item.item_type==='date'||item.item_type==='reg45' ? <span style={{background:'var(--surface2)',border:'1px solid var(--accent)',color:'var(--accent)',borderRadius:4,padding:'2px 8px',fontSize:12}}>{item.freq||item.max_days+'d'}</span> : <span style={{background:'var(--green-bg)',border:'1px solid var(--green)',color:'var(--green)',borderRadius:4,padding:'2px 8px',fontSize:12}}>Task</span>}
                       : <span style={{background:'var(--green-bg)',border:'1px solid var(--green)',color:'var(--green)',borderRadius:4,padding:'2px 8px',fontSize:12}}>Task</span>}
                   </td>
                   <td style={{...td,textAlign:'center'}}>
-                    {item.item_type==='date' ? <input type="date" value={item.last_completed||''} onChange={e=>onUpdate(item.id,'last_completed',e.target.value)} style={{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:'var(--radius-sm)',padding:'5px 8px',color:'var(--text)',fontSize:13,outline:'none'}} />
+                    {item.item_type==='reg45' ? (<div style={{display:'flex',flexDirection:'column',gap:6}}><input type='date' value={item.last_completed||''} onChange={e=>onUpdate(item.id,'last_completed',e.target.value)} style={{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:'var(--radius-sm)',padding:'5px 8px',color:'var(--text)',fontSize:13,outline:'none'}} /><div style={{display:'flex',gap:16,marginTop:2}}><div style={{display:'flex',alignItems:'center',gap:6}}><Toggle value={item.status==='done'} onChange={v=>onUpdate(item.id,'status',v?'done':'pending')} /><span style={{fontSize:12,color:'var(--muted)'}}>Completed</span></div><div style={{display:'flex',alignItems:'center',gap:6}}><Toggle value={item.reg45_submitted} onChange={v=>onUpdate(item.id,'reg45_submitted',v)} /><span style={{fontSize:12,color:item.reg45_submitted?'var(--green)':'var(--muted)'}}>Submitted to Ofsted</span></div></div></div>) : item.item_type==='date' ? <input type='date' value={item.last_completed||''} onChange={e=>onUpdate(item.id,'last_completed',e.target.value)} style={{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:'var(--radius-sm)',padding:'5px 8px',color:'var(--text)',fontSize:13,outline:'none'}} /> : <div style={{display:'flex',alignItems:'center',gap:8,justifyContent:'center'}}><Toggle value={item.status==='done'} onChange={v=>onUpdate(item.id,'status',v?'done':'pending')} /><span style={{fontSize:12,color:'var(--muted)'}}>{item.status==='done'?'Done':'Pending'}</span></div>}
                       : <div style={{display:'flex',alignItems:'center',gap:8,justifyContent:'center'}}><Toggle value={item.status==='done'} onChange={v=>onUpdate(item.id,'status',v?'done':'pending')} /><span style={{fontSize:12,color:'var(--muted)'}}>{item.status==='done'?'Done':'Pending'}</span></div>}
                   </td>
                   <td style={{...td,textAlign:'center'}}><Pill status={rag} /></td>
