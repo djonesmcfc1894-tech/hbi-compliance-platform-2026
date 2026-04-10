@@ -67,13 +67,19 @@ function calcChildScore(child) {
 
 function calcLiveScore(events) {
   if (!events.length) return 100
-  const compliant = events.filter(ev => {
-    const base = ev.reactive_keywork && ev.staff_debrief && ev.report_completed && ev.shared_social_worker && ev.risk_assessment_review && ev.placement_plan_updated
-    const reg40 = !ev.reg40_applicable || ev.reg40_completed
-    const rhi = ev.event_type !== 'mfh' || !ev.return_home_interview_applicable || ev.return_home_interview
-    return base && reg40 && rhi
-  }).length
-  return Math.round((compliant / events.length) * 100)
+  let totalChecks = 0
+  let passedChecks = 0
+  events.forEach(ev => {
+    const checks = [
+      ev.reactive_keywork, ev.staff_debrief, ev.report_completed,
+      ev.shared_social_worker, ev.risk_assessment_review, ev.placement_plan_updated
+    ]
+    if (ev.reg40_applicable) checks.push(ev.reg40_completed)
+    if (ev.event_type === 'mfh' && ev.return_home_interview_applicable) checks.push(ev.return_home_interview)
+    totalChecks += checks.length
+    passedChecks += checks.filter(Boolean).length
+  })
+  return totalChecks === 0 ? 100 : Math.round((passedChecks / totalChecks) * 100)
 }
 
 // ─── Constants ─────────────────────────────────────────────────────
