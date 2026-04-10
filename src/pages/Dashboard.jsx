@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+﻿import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 
 // ─── Scoring ───────────────────────────────────────────────────────
@@ -143,24 +143,20 @@ function Row({ label, children: c }) {
   )
 }
 
-// ─── Rev Counter ───────────────────────────────────────────────────
+// --- Score Card ---------------------------------------------------
 function RevCounter({ label, pct, sub }) {
-const rating = getRating(pct)
-  const barColor = pct >= 80 ? '#22c55e' : pct >= 50 ? '#4f7cff' : pct >= 25 ? '#f59e0b' : '#ef4444'
+  const clamp = Math.min(100, Math.max(0, pct ?? 0))
+  const rating = getRating(clamp)
+  const gradientBg = clamp >= 80 ? 'linear-gradient(135deg,#f0fdf4,#dcfce7)' : clamp >= 50 ? 'linear-gradient(135deg,#eff6ff,#dbeafe)' : clamp >= 25 ? 'linear-gradient(135deg,#fffbeb,#fef3c7)' : 'linear-gradient(135deg,#fef2f2,#fee2e2)'
   return (
-    <div style={{ display:'flex', flexDirection:'column', gap:12, width:'100%' }}>
-      <div style={{ fontSize:11, color:'var(--muted)', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.06em' }}>{label}</div>
-      <div style={{ fontSize:48, fontWeight:700, lineHeight:1, color:barColor, fontFamily:'Syne,sans-serif' }}>
-        {pct}<span style={{ fontSize:24 }}>%</span>
+    <div style={{ background: gradientBg, borderRadius: 16, padding: '28px 24px', display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
+      <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--muted)' }}>{label}</div>
+      <div style={{ fontSize: 52, fontWeight: 900, color: rating.color, lineHeight: 1, fontFamily: 'Syne,sans-serif' }}>{Math.round(clamp)}%</div>
+      <div style={{ fontSize: 14, fontWeight: 700, color: rating.color }}>{rating.label}</div>
+      {sub && <div style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.5 }}>{sub}</div>}
+      <div style={{ height: 8, borderRadius: 4, background: 'rgba(0,0,0,0.08)', marginTop: 4 }}>
+        <div style={{ height: '100%', width: `${clamp}%`, borderRadius: 4, background: rating.color, transition: 'width 0.5s ease' }} />
       </div>
-      <div style={{ height:6, background:'var(--border)', borderRadius:3, overflow:'hidden' }}>
-        <div style={{ height:'100%', width:`${pct}%`, background:'linear-gradient(90deg,#ef4444 0%,#f59e0b 25%,#4f7cff 50%,#22c55e 80%)', borderRadius:3, transition:'width 0.6s' }} />
-      </div>
-      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-        <div style={{ width:8, height:8, borderRadius:'50%', background:barColor, flexShrink:0 }} />
-        <span style={{ fontSize:13, color:barColor, fontWeight:600 }}>{rating.label}</span>
-      </div>
-      {sub && <div style={{ fontSize:12, color:'var(--muted)', lineHeight:1.5 }}>{sub}</div>}
     </div>
   )
 }
